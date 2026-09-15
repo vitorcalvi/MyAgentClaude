@@ -1,0 +1,60 @@
+# swarm-team.yaml — agy parallel team roster
+# Agy reads this at run start. Agy still DECIDES assignment per brief;
+# this file sets the roster, caps, and routing defaults.
+
+coordinator:
+  agent: agy
+  cli: gemini            # agy = Google CLI
+  mode: coordinator-only # agy executes no brief itself
+
+architect:
+  agent: claude          # Claude Code — writes the ONE goal, owns verification
+  goals_per_run: 1
+  dispatches_agy: once_per_goal
+  verification:
+    owner: claude
+    dispatcher: claude   # NEVER agy
+    worker: goose-verify
+    input: raw-worker-outputs-only
+    reads_raw_report_before_reply: true
+
+workers:
+  max_concurrent: 5
+  pool:
+    - id: goose-a        # goose = Block goose CLI, tool-enabled local execution
+      kind: goose
+      strengths: [write-code, edit-files, run-tests, shell, repo-ops]
+    - id: goose-b
+      kind: goose
+      strengths: [write-code, edit-files, run-tests, shell, repo-ops]
+    - id: goose-verify
+      kind: goose
+      strengths: [read-only-checks, evidence-collection]
+      reserved_for: verification   # excluded from worker fan-out
+    - id: minimax-a      # MiniMax — flat $55/mo, cheap fan-out for prose/LLM-heavy work
+      kind: minimax
+      strengths: [drafting, summarize-long-context, research-synthesis, review-prose]
+    - id: minimax-b
+      kind: minimax
+      strengths: [drafting, summarize-long-context, research-synthesis, review-prose]
+
+routing:          # defaults; agy decides and logs overrides with a reason
+  code_and_execution: goose
+  prose_and_long_context: minimax
+  mixed: goose           # + MiniMax sub-brief for the prose portion
+  verification: goose-verify   # Claude only
+
+retry_policy:
+  max_retries_per_brief: 2        # attempt 2: same class + failure context
+  retry2_switches_class: true     # attempt 3: other class + slimmed brief
+  never_weaken_done_criteria: true
+  after_exhaustion: BLOCKED       # surface in report; never drop silently
+  quota_exhausted_shortcircuit: true      # no retry spent; BLOCKED immediately, cascades to dependents
+  assumption_invalid_shortcircuit: true   # no retry spent; BLOCKED immediately, cascades to dependents
+
+consolidation:
+  single_report: true
+  include: [goal, brief_ledger, deliverables, conflicts, retry_ledger, artifacts]
+  verdict_by_agy: forbidden       # DONE/BLOCKED only; Claude decides after verify
+
+runs_dir: .runs                   # artifacts persisted per run for independent verification
