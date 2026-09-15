@@ -1,0 +1,15 @@
+{
+  "brief_id": "B1",
+  "worker": "goose-a",
+  "attempt": 1,
+  "status": "DONE",
+  "output_ref": "results/B1.attempt-1/",
+  "summary": "EXAMPLE ARTIFACT. Added MIT pointer sentence to README.md.",
+  "done_criteria_check": [
+    {"criterion": "README.md contains the exact sentence MIT. See LICENSE.", "met": true, "evidence": "README.md:last-heading"},
+    {"criterion": "git diff --name-only lists only README.md", "met": true, "evidence": "results/B1.attempt-1/diff-names.txt"},
+    {"criterion": "LICENSE file hash unchanged", "met": true, "evidence": "results/B1.attempt-1/license.sha256"}
+  ],
+  "artifacts": ["README.md"],
+  "errors": []
+}

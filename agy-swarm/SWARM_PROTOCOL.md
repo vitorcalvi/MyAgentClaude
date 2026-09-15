@@ -69,6 +69,8 @@ Run layout:
 Failure result: `status: "FAILED"`, `errors: [{class, message, tail}]`.
 Error classes: `TIMEOUT`, `TOOL_ERROR`, `MODEL_ERROR`, `CRITERIA_NOT_MET`, `QUOTA_EXHAUSTED`, `ASSUMPTION_INVALID`.
 
+> The `worker` field is a **roster id** from `swarm-team.yaml` (`goose-a`, `goose-b`, `minimax-a`, `minimax-b`, `goose-verify`). The runtime is always `goose`; `minimax-*` IDs are task-shapes (prose / long-context) routed onto the same executable.
+
 ## 4. Agy fan-out loop
 
 ```python
